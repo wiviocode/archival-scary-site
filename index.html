@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Bobby's Sepulchral Archives - [ENTER AT OWN RISK]</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --forum-bg: #DCDCDC; /* Slightly different grey */
+            --forum-border: #909090;
+            --forum-header-bg: #00005A; /* Darker Navy */
+            --forum-header-text: #FFFFFF;
+            --forum-category-bg: #B0B0B0;
+            --forum-link-color: #0000CC;
+            --forum-text-color: #1A1A1A;
+            --forum-accent-glitch: #B30000; /* Darker red */
+            --font-pixel: 'VT323', monospace;
+            --font-system: "Tahoma", "Geneva", sans-serif; /* Classic 2000s */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-system);
+            background-color: var(--forum-bg);
+            color: var(--forum-text-color);
+            line-height: 1.6;
+            font-size: 15px; /* Base for iPad */
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAABNJREFUGFdjuHPnTv8ZGBgYkDZgAAD2BA8DS32YgAAAAABJRU5ErkJggg=="); /* Subtle pixel pattern */
+        }
+
+        .password-gate-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.9); display: flex;
+            justify-content: center; align-items: center; z-index: 2000; padding: 15px;
+        }
+        .password-gate-content {
+            background-color: #C8C8C8; border: 3px outset #888888; padding: 30px;
+            text-align: center; width: 100%; max-width: 480px; box-shadow: 6px 6px 0px #444;
+        }
+        .password-gate-content h2 {
+            font-family: var(--font-pixel); color: var(--forum-header-bg); font-size: 26px;
+            margin-bottom: 15px; border-bottom: 2px dotted #888888; padding-bottom: 10px;
+            text-shadow: 1px 1px 0px #FFF;
+        }
+        .password-gate-content p { margin-bottom: 20px; font-size: 14px; }
+        .password-gate-content input[type="password"] {
+            font-family: var(--font-system); padding: 12px; margin-bottom: 25px;
+            border: 2px inset #888888; width: calc(100% - 28px); font-size: 17px;
+            text-align: center;
+        }
+        .password-gate-content button {
+            font-family: var(--font-pixel); padding: 12px 25px; background-color: #A0A0A0;
+            border: 2px outset #707070; cursor: pointer; font-size: 20px; color: var(--forum-header-bg);
+        }
+        .password-gate-content button:active { border-style: inset; background-color: #909090; }
+        .gate-error-message { margin-top: 15px; color: var(--forum-accent-glitch); font-weight: bold; font-family: var(--font-pixel); font-size: 18px; }
+
+        .forum-wrapper {
+            width: 100%; max-width: 850px; margin: 10px auto;
+            background-color: #EAEAEA; border: 2px solid var(--forum-border);
+            box-shadow: 4px 4px 0 #777; display: none;
+        }
+        .forum-header {
+            background-color: var(--forum-header-bg); color: var(--forum-header-text);
+            padding: 12px; text-align: center; border-bottom: 3px solid #000033;
+        }
+        .forum-header h1 {
+            font-family: var(--font-pixel); font-size: 30px; letter-spacing: 2px;
+            text-shadow: 2px 2px 0 #00000050;
+            animation: subtleGlitch 15s infinite steps(1);
+        }
+        @keyframes subtleGlitch {
+            49.5% { opacity: 1; } 50% { opacity: 0.9; transform: skewX(-0.5deg); } 50.5% { opacity: 1; transform: skewX(0); }
+        }
+        .forum-header .user-info { font-size: 13px; margin-top: 6px; opacity: 0.8; }
+        .forum-header .user-info strong { color: #FFFF99; }
+
+        .forum-nav { background-color: #C0C0C0; padding: 9px; border-bottom: 1px solid var(--forum-border); }
+        .forum-nav ul { list-style-type: none; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        .forum-nav ul li button {
+            font-family: var(--font-system); font-weight: bold; background: none; border: none;
+            color: var(--forum-link-color); cursor: pointer; padding: 6px 10px; font-size: 15px;
+            text-decoration: underline; border-radius: 3px;
+        }
+        .forum-nav ul li button:hover { background-color: #D0D0D0; color: var(--forum-accent-glitch); }
+        .forum-nav ul li button.active-nav { background-color: #A0A0A0; color: var(--forum-header-text); text-decoration: none; }
+        .forum-nav ul li button.locked { color: #888; text-decoration: line-through; cursor: default; }
+        .forum-nav ul li button.locked:hover { background-color: transparent; color: #888; }
+
+
+        .forum-page-content { padding: 15px 20px; display: none; }
+        .forum-page-content.active { display: block; animation: fadeInPage 0.5s ease-out; }
+        @keyframes fadeInPage { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-title-bar {
+            background-color: var(--forum-category-bg); padding: 9px 15px; margin-bottom: 18px;
+            border: 1px solid var(--forum-border); font-weight: bold; font-size: 19px; color: #222;
+            text-shadow: 1px 1px 0px #FFF;
+        }
+        .page-title-bar .glitch-char-title { display: inline-block; animation: glitchCharAnim 0.2s infinite steps(2); }
+        @keyframes glitchCharAnim { to { color: var(--forum-accent-glitch); font-style: italic; } }
+
+        .forum-post {
+            background-color: #FDFDFD; border: 1px solid #C0C0C0; margin-bottom: 18px;
+            box-shadow: 3px 3px 0px #D0D0D0; border-radius: 3px; overflow: hidden;
+        }
+        .post-header {
+            background-color: #E0E0E0; padding: 9px 12px; border-bottom: 1px solid #C0C0C0; font-size: 14px;
+        }
+        .post-header .username { color: #000080; font-weight: bold; }
+        .post-header .timestamp { float: right; color: #666; }
+        .post-content { padding: 18px; font-size: 16px; line-height: 1.7; }
+        .post-content h3 { font-family: var(--font-pixel); font-size: 20px; color: var(--forum-header-bg); margin-bottom: 10px; }
+        .post-content .glitched-text {
+            display: inline-block; /* Important for transform */
+            position: relative;
+            color: var(--forum-accent-glitch);
+            font-family: var(--font-pixel);
+            animation: textGlitchEffect 3s infinite steps(3);
+        }
+        @keyframes textGlitchEffect {
+            0%, 100% { text-shadow: 1px 1px #00FFFF, -1px -1px #FF00FF; opacity: 1;}
+            33% { text-shadow: -1px 1px #00FFFF, 1px -1px #FF00FF; transform: skewX(-5deg); opacity: 0.8;}
+            66% { text-shadow: 1px -1px #00FFFF, -1px 1px #FF00FF; transform: skewX(5deg); opacity: 0.9;}
+        }
+        .corrupted-image-link {
+            display: inline-block;
+            background-color: #E0E0E0; color: var(--forum-link-color); text-decoration: underline;
+            padding: 5px 8px; margin: 5px 2px; border: 1px dashed #A0A0A0; cursor: pointer;
+            font-family: var(--font-pixel); font-size: 14px;
+            position: relative; /* For tooltip */
+        }
+        .corrupted-image-link .tooltip-text {
+            visibility: hidden; width: 120px; background-color: #333; color: #fff;
+            text-align: center; border-radius: 4px; padding: 8px; font-family: var(--font-pixel);
+            position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -60px;
+            opacity: 0; transition: opacity 0.3s; font-size: 18px; white-space: pre;
+        }
+        .corrupted-image-link:hover .tooltip-text { visibility: visible; opacity: 1; }
+
+
+        /* Ritual Altar Styling */
+        #ritualAltar {
+            background-color: #D0D0D0; border: 2px inset #A0A0A0; padding: 20px; margin: 20px 0;
+            text-align: center;
+        }
+        #ritualAltar h4 { font-family: var(--font-pixel); font-size: 22px; margin-bottom: 15px; color: #333; }
+        .glyph-palette button {
+            font-family: var(--font-pixel); font-size: 28px; /* Glyph size on buttons */
+            background-color: #E0E0E0; border: 1px outset #B0B0B0;
+            padding: 8px 10px; margin: 5px; cursor: pointer; min-width: 60px; /* Ensure buttons are wide enough */
+            line-height: 1;
+            text-align: center;
+        }
+        .glyph-palette button:active { border-style: inset; }
+        .glyph-palette button:hover { background-color: #F0F0F0; }
+
+        #altarGrid { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
+        .altar-slot {
+            width: 60px; height: 60px; border: 2px dashed #888;
+            background-color: #C0C0C0; display: flex; justify-content: center; align-items: center;
+            font-family: var(--font-pixel);
+            font-size: 28px; /* <<< UPDATED to match button size */
+            line-height: 1;  /* <<< ADDED for consistency */
+            color: var(--forum-header-bg);
+            box-shadow: inset 1px 1px 3px #00000030;
+            overflow: hidden; /* <<< ADDED to prevent strange overflow */
+            text-align: center; /* <<< ADDED for good measure */
+        }
+        .altar-slot.correct { border-style: solid; border-color: #008000; background-color: #D0E0D0; }
+        .altar-slot.incorrect { border-style: solid; border-color: var(--forum-accent-glitch); background-color: #E0D0D0; }
+
+        #ritualControls button {
+            font-family: var(--font-pixel); font-size: 18px; padding: 10px 18px;
+            margin-top: 10px;
+        }
+        #ritualMessage { margin-top: 15px; font-weight: bold; font-family: var(--font-pixel); font-size: 18px; }
+
+        /* Activation Console */
+        #activationConsole { display: none; margin-top: 25px; padding: 15px; background-color: #222; border: 2px outset #000; color: #0F0; }
+        #activationConsole h4 { font-family: var(--font-pixel); font-size: 20px; margin-bottom: 10px; text-align: center; color: #0F0; }
+        #activationConsole input[type="text"] {
+            font-family: var(--font-pixel); background-color: #111; color: #0F0; border: 1px solid #0A0;
+            padding: 8px; width: calc(100% - 20px); max-width: 300px; margin: 0 auto 10px auto; display: block;
+            text-align: center; font-size: 18px;
+        }
+        #activationConsole button {
+            font-family: var(--font-pixel); background-color: #050; color: #0F0; border: 1px outset #0A0;
+            padding: 8px 15px; font-size: 16px; display: block; margin: 0 auto;
+        }
+        #activationConsole button:active { border-style: inset; }
+
+
+        /* Video Player placeholder */
+        .video-feed-container { text-align: center; }
+        .video-placeholder-2000s {
+            background-color: #000; color: #CCC; font-family: var(--font-pixel);
+            padding: 10px; border: 3px inset #333; margin: 20px auto;
+            width: 100%; max-width: 580px; /* For 4:3 ish aspect */
+        }
+        .video-placeholder-2000s video { display: block; width: 100%; height: auto; background-color: #000; }
+        .video-placeholder-2000s p { font-size: 14px; margin-top: 8px; color: #888; }
+
+        .forum-footer {
+            text-align: center; font-size: 13px; padding: 12px;
+            border-top: 1px solid var(--forum-border); color: #777; margin-top: 20px;
+        }
+        .forum-footer .warning-text { font-family: var(--font-pixel); color: var(--forum-accent-glitch); animation: pulseWarning 2s infinite; }
+        @keyframes pulseWarning { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="password-gate-overlay" id="passwordGateOverlay">
+        <div class="password-gate-content">
+            <h2>:: SEPULCHRAL ARCHIVES ::</h2>
+            <p>This partition requires Level Gamma clearance. Authentication required.</p>
+            <input type="password" id="sitePassword" placeholder="[ AUTHENTICATION KEY ]">
+            <button id="submitSitePassword">AUTHORIZE</button>
+            <p id="gateErrorMessage" class="gate-error-message" style="display:none;"></p>
+        </div>
+    </div>
+
+    <div class="forum-wrapper" id="forumWrapper">
+        <header class="forum-header">
+            <h1>Bobby's Sepulchral Archives</h1>
+            <div class="user-info">User: <strong>BobbyR_TruthSeeker</strong> | Connection: <span style="color: #FF9999;">[UNSTABLE]</span></div>
+        </header>
+
+        <nav class="forum-nav">
+            <ul>
+                <li><button id="nav-home" class="active-nav">Main Board</button></li>
+                <li><button id="nav-ritual">Bobby's Log: The Ritual Chamber</button></li>
+                <li><button id="nav-feed" class="locked">Surveillance Feed [LOCKED]</button></li>
+            </ul>
+        </nav>
+
+        <main id="main-forum-content">
+            <div id="page-home" class="forum-page-content active">
+                <div class="page-title-bar">Welcome to the <span class="glitch-char-title">D</span>eep Archives</div>
+                <div class="forum-post">
+                    <div class="post-header"><span class="username">BobbyR_TruthSeeker</span> <span class="timestamp">Date Unknown</span></div>
+                    <div class="post-content">
+                        <p>You found it. My private server. This is where I document the... *real* stuff. The things that'd get me laughed out of any sane forum (or worse).</p>
+                        <p>If you're here, you're either very lost, or you're like me. Seeking.</p>
+                        <p>Be warned: The data here is... volatile. And I think something is trying to corrupt it. Or maybe that's just me.</p>
+                        <p>Navigate to "The Ritual Chamber" in my log to see my latest, and perhaps final, experiment.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-ritual" class="forum-page-content">
+                <div class="page-title-bar">Thread: Experiment Log - <span class="glitch-char-title">R</span>itual of Unveiling</div>
+                <div class="forum-post">
+                    <div class="post-header"><span class="username">BobbyR_TruthSeeker</span> <span class="timestamp">LOG ENTRY #771</span></div>
+                    <div class="post-content">
+                        <h3>The Calling - Fragment 1</h3>
+                        <p>I'm close. So close. The entity... it responds to specific resonance. The old texts are fragmented, but I've pieced some of it together. The primary activation chant... it must be perfect. My notes say: "The frequency requires... <span class="glitched-text">V0ID_GAZE</span> ...for the veil to thin." Yeah, that's it! `V0ID_GAZE` is the core phrase.</p>
+                    </div>
+                </div>
+                <div class="forum-post">
+                    <div class="post-header"><span class="username">BobbyR_TruthSeeker</span> <span class="timestamp">LOG ENTRY #772</span></div>
+                    <div class="post-content">
+                        <h3>Glyph Schematics - Fragment 2 (Corrupted Attachments)</h3>
+                        <p>The ritual requires specific glyphs. My scanner is acting up, these are the best I could recover. Some are probably noise. Hover over the links to see what I mean (if the data hasn't degraded further):</p>
+                        <p>
+                            <span class="corrupted-image-link">glyph_serpent_UNSTABLE.gif<span class="tooltip-text">N==></span></span> <!-- Serpent -->
+                            <span class="corrupted-image-link">glyph_triangle_STATIC.bmp<span class="tooltip-text">/_\</span></span> <!-- Decoy -->
+                            <span class="corrupted-image-link">glyph_eye_FLICKER.png<span class="tooltip-text">( O )</span></span> <!-- Eye -->
+                            <span class="corrupted-image-link">glyph_spiral_NOISE.dat<span class="tooltip-text">(@)</span></span> <!-- Decoy -->
+                            <span class="corrupted-image-link">glyph_star_PARTIAL.jpeg<span class="tooltip-text">*+*</span></span> <!-- Star -->
+                            <span class="corrupted-image-link">glyph_moon_BROKEN.tiff<span class="tooltip-text">((</span></span> <!-- Decoy / Negative Clue -->
+                        </p>
+                        <p>I really hope those render correctly for you...</p>
+                    </div>
+                </div>
+                 <div class="forum-post">
+                    <div class="post-header"><span class="username">BobbyR_TruthSeeker</span> <span class="timestamp">LOG ENTRY #773</span></div>
+                    <div class="post-content">
+                        <h3>Altar Configuration & Numeric Lock - Fragment 3</h3>
+                        <p>The altar configuration is key. From what I can decipher: "The Serpent always looks towards the Eye. The Star provides the binding matrix, overseeing them both." This implies a specific order. And there's something about the number of *true* sigils... "Three true sigils are required for the primary harmonic alignment." So, the number **3** is important. It's part of the final sequence.</p>
+                    </div>
+                </div>
+
+                <!-- The Ritual Altar -->
+                <div id="ritualAltar">
+                    <h4>RITUAL ALIGNMENT INTERFACE v0.7b</h4>
+                    <p style="font-size:14px; margin-bottom:15px;">Click glyphs from palette to place on altar. Sequence is critical.</p>
+                    <div class="glyph-palette">
+                        <button data-glyph-id="serpent" title="Serpent Glyph">N==></button> <!-- <<< UPDATED glyph text -->
+                        <button data-glyph-id="triangle" title="Triangle Glyph">/_\</button>
+                        <button data-glyph-id="eye" title="Eye Glyph">( O )</button>
+                        <button data-glyph-id="spiral" title="Spiral Glyph">(@)</button>
+                        <button data-glyph-id="star" title="Star Glyph">*+*</button>
+                        <button data-glyph-id="moon" title="Moon Glyph">( (</button>
+                    </div>
+                    <div id="altarGrid">
+                        <div class="altar-slot" data-slot-index="0"></div>
+                        <div class="altar-slot" data-slot-index="1"></div>
+                        <div class="altar-slot" data-slot-index="2"></div>
+                    </div>
+                    <div id="ritualControls">
+                        <button id="resetAltarButton" style="background-color:#E0A0A0; border-color:#C08080;">RESET ALTAR</button>
+                    </div>
+                    <p id="ritualMessage"></p>
+                </div>
+
+                <!-- Activation Console (Initially Hidden) -->
+                <div id="activationConsole">
+                    <h4>:: SECURE CONNECTION TERMINAL ::</h4>
+                    <p style="font-size:14px; text-align:center; margin-bottom:10px;">Altar Alignment Confirmed. Enter Final Activation Sequence:</p>
+                    <input type="text" id="activationCodeInput" placeholder="[ SEQUENCE KEY ]">
+                    <button id="initiateConnectionButton">INITIATE CONNECTION</button>
+                    <p id="connectionMessage" style="text-align:center; margin-top:10px;"></p>
+                </div>
+
+            </div>
+
+            <div id="page-feed" class="forum-page-content">
+                <div class="page-title-bar">SECURE CHANNEL: <span class="glitch-char-title">S</span>urveillance Feed Online</div>
+                <div class="video-feed-container">
+                    <p style="font-family: var(--font-pixel); font-size:18px; color: #008000; margin-bottom:10px;">CONNECTION ESTABLISHED :: PLAYING ARCHIVED FOOTAGE...</p>
+                    <div class="video-placeholder-2000s">
+                        <video id="surveillanceVideo" width="560" height="315" controls poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+                            <source src="placeholder.mp4" type="video/mp4">
+                            Your browser does not support the video tag, or the file "placeholder.mp4" is missing.
+                        </video>
+                        <p>Archive File: CCTV_Basement_Incident_#####.mp4</p>
+                    </div>
+                    <div class="forum-post" style="margin-top:20px; border-color:var(--forum-accent-glitch);">
+                        <div class="post-header"><span class="username">BobbyR_TruthSeeker</span> <span class="timestamp">FINAL LOG - URGENT</span></div>
+                        <div class="post-content">
+                            <h3 style="color:var(--forum-accent-glitch);">IT'S ON THE TAPE!</h3>
+                            <p>The ritual... it worked. Too well. The camera caught it all. Gretchen... the *thing*... and Blake... he ran OUT! AFTER it happened! The timestamp proves it! He's innocent!</p>
+                            <p>I have to get this out there... before they... or IT... finds me.</p>
+                            <p style="font-weight:bold; color:var(--forum-accent-glitch);">Oh god, what have I done?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="forum-footer">
+            <p>© 200X Bobby's Sepulchral Archives. All data is volatile.</p>
+            <p class="warning-text">SYSTEM WARNING :: INTEGRITY COMPROMISED :: REALITY UNSTABLE</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const passwordGateOverlay = document.getElementById('passwordGateOverlay');
+            const sitePasswordInput = document.getElementById('sitePassword');
+            const submitSitePasswordBtn = document.getElementById('submitSitePassword');
+            const gateErrorMessage = document.getElementById('gateErrorMessage');
+            const forumWrapper = document.getElementById('forumWrapper');
+
+            const CORRECT_SITE_PASSWORD = "SEPULCHRAL";
+
+            submitSitePasswordBtn.addEventListener('click', () => {
+                if (sitePasswordInput.value.trim().toUpperCase() === CORRECT_SITE_PASSWORD) {
+                    passwordGateOverlay.style.display = 'none';
+                    forumWrapper.style.display = 'block';
+                } else {
+                    gateErrorMessage.textContent = "AUTHORIZATION FAILED :: INVALID KEY";
+                    gateErrorMessage.style.display = 'block';
+                    const gateContent = passwordGateOverlay.querySelector('.password-gate-content');
+                    gateContent.style.animation = 'gateShake 0.3s';
+                    setTimeout(() => { gateContent.style.animation = ''; gateErrorMessage.style.display = 'none';}, 500);
+                }
+            });
+            sitePasswordInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') { event.preventDefault(); submitSitePasswordBtn.click(); }
+            });
+
+            // Forum Navigation
+            const navButtons = {
+                home: document.getElementById('nav-home'),
+                ritual: document.getElementById('nav-ritual'),
+                feed: document.getElementById('nav-feed')
+            };
+            const pages = {
+                home: document.getElementById('page-home'),
+                ritual: document.getElementById('page-ritual'),
+                feed: document.getElementById('page-feed')
+            };
+            let feedUnlocked = false;
+
+            function setActiveNav(activeBtnId) {
+                for (const id in navButtons) {
+                    navButtons[id].classList.remove('active-nav');
+                }
+                if(navButtons[activeBtnId]) navButtons[activeBtnId].classList.add('active-nav');
+            }
+
+            function showPage(pageId) {
+                for (const id in pages) { pages[id].classList.remove('active'); }
+                if (pages[pageId]) { pages[pageId].classList.add('active'); setActiveNav(pageId); }
+            }
+
+            navButtons.home.addEventListener('click', () => showPage('home'));
+            navButtons.ritual.addEventListener('click', () => showPage('ritual'));
+            navButtons.feed.addEventListener('click', () => {
+                if (feedUnlocked) {
+                    showPage('feed');
+                    const video = document.getElementById('surveillanceVideo');
+                    if (video) {
+                         // Attempt to play. Modern browsers might block autoplay without user interaction.
+                        video.play().catch(error => {
+                            console.warn("Video autoplay was prevented or an error occurred:", error);
+                            // Optionally, you could display a message to the user to click the play button.
+                        });
+                    }
+                } else {
+                    alert("Secure Channel Offline :: Complete The Ritual of Unveiling to establish connection.");
+                }
+            });
+
+            // Ritual Altar Logic
+            const glyphPaletteButtons = document.querySelectorAll('.glyph-palette button');
+            const altarSlots = document.querySelectorAll('#altarGrid .altar-slot');
+            const resetAltarButton = document.getElementById('resetAltarButton');
+            const ritualMessage = document.getElementById('ritualMessage');
+            const activationConsole = document.getElementById('activationConsole');
+            const activationCodeInput = document.getElementById('activationCodeInput');
+            const initiateConnectionButton = document.getElementById('initiateConnectionButton');
+            const connectionMessage = document.getElementById('connectionMessage');
+
+            const CORRECT_GLYPH_SEQUENCE = ["serpent", "eye", "star"];
+            const ACTIVATION_PHRASE = "V0ID_GAZE";
+            const SIGIL_COUNT = 3;
+            const FINAL_ACTIVATION_CODE = `${ACTIVATION_PHRASE}${SIGIL_COUNT}`; // V0ID_GAZE3
+
+            let currentAltarSequence = [];
+            let currentSlotIndex = 0;
+
+            glyphPaletteButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    if (currentSlotIndex < altarSlots.length) {
+                        const glyphId = button.dataset.glyphId;
+                        const glyphSymbol = button.textContent;
+                        altarSlots[currentSlotIndex].textContent = glyphSymbol;
+                        altarSlots[currentSlotIndex].dataset.placedGlyph = glyphId;
+                        currentAltarSequence.push(glyphId);
+                        currentSlotIndex++;
+                        ritualMessage.textContent = '';
+
+                        if (currentSlotIndex === altarSlots.length) {
+                            checkAltarSequence();
+                        }
+                    } else {
+                        ritualMessage.textContent = "Altar is full. Reset to try again.";
+                        ritualMessage.style.color = "var(--forum-accent-glitch)";
+                    }
+                });
+            });
+
+            function resetAltar() {
+                currentAltarSequence = [];
+                currentSlotIndex = 0;
+                altarSlots.forEach(slot => {
+                    slot.textContent = '';
+                    slot.classList.remove('correct', 'incorrect');
+                    delete slot.dataset.placedGlyph;
+                });
+                ritualMessage.textContent = "Altar reset.";
+                ritualMessage.style.color = "#555";
+                activationConsole.style.display = 'none';
+                activationCodeInput.value = ''; // Clear activation input on reset
+                connectionMessage.textContent = '';
+            }
+            resetAltarButton.addEventListener('click', resetAltar);
+
+            function checkAltarSequence() {
+                let allCorrect = true;
+                for (let i = 0; i < CORRECT_GLYPH_SEQUENCE.length; i++) {
+                    if (currentAltarSequence[i] !== CORRECT_GLYPH_SEQUENCE[i]) {
+                        allCorrect = false;
+                        altarSlots[i].classList.add('incorrect');
+                    } else {
+                        altarSlots[i].classList.add('correct');
+                    }
+                }
+                 // Also mark remaining slots if sequence is shorter than slots but still wrong
+                for (let i = CORRECT_GLYPH_SEQUENCE.length; i < currentAltarSequence.length; i++) {
+                    altarSlots[i].classList.add('incorrect');
+                    allCorrect = false;
+                }
+
+
+                if (allCorrect && currentAltarSequence.length === CORRECT_GLYPH_SEQUENCE.length) {
+                    ritualMessage.textContent = "SEQUENCE ACCEPTED :: ALIGNMENT STABLE :: AWAITING ACTIVATION...";
+                    ritualMessage.style.color = "#008000";
+                    activationConsole.style.display = 'block';
+                } else {
+                    ritualMessage.textContent = "SEQUENCE INCORRECT :: ENERGY FLUCTUATIONS DETECTED! RESET ALTAR.";
+                    ritualMessage.style.color = "var(--forum-accent-glitch)";
+                }
+            }
+
+            initiateConnectionButton.addEventListener('click', () => {
+                if (activationCodeInput.value.trim().toUpperCase() === FINAL_ACTIVATION_CODE.toUpperCase()) {
+                    connectionMessage.textContent = "ACTIVATION SUCCESSFUL! Establishing secure connection to Surveillance Feed...";
+                    connectionMessage.style.color = "#00FF00";
+                    feedUnlocked = true;
+                    navButtons.feed.classList.remove('locked');
+                    navButtons.feed.click(); // Automatically navigate and try to play video
+                } else {
+                    connectionMessage.textContent = "ACTIVATION FAILED! CONNECTION REFUSED! Possible feedback loop detected!";
+                    connectionMessage.style.color = "#FF0000";
+                    activationCodeInput.style.animation = 'gateShake 0.3s';
+                    setTimeout(() => { activationCodeInput.style.animation = ''; }, 300);
+                }
+            });
+
+
+            // Initial page
+            showPage('home');
+
+            // CSS for gateShake (can be reused)
+            const styleSheet = document.createElement("style");
+            styleSheet.type = "text/css";
+            styleSheet.innerText = `
+                @keyframes gateShake {
+                    0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); }
+                    50% { transform: translateX(6px); } 75% { transform: translateX(-6px); }
+                }
+            `;
+            document.head.appendChild(styleSheet);
+        });
+    </script>
+</body>
+</html>
