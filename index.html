@@ -89,6 +89,18 @@
         .forum-nav ul li button.locked { color: #888; text-decoration: line-through; cursor: default; }
         .forum-nav ul li button.locked:hover { background-color: transparent; color: #888; }
 
+        .highlighted-nav-button {
+            background-color: #FFFF00 !important; /* Bright yellow */
+            color: #000000 !important; /* Black text */
+            border: 2px solid #FFD700 !important; /* Gold border */
+            box-shadow: 0 0 10px #FFFF00, 0 0 5px #FFFF00 inset; /* Glow effect */
+            font-weight: bold !important;
+            text-decoration: none !important;
+        }
+        .highlighted-nav-button:hover {
+            background-color: #FFEE58 !important; /* Lighter yellow on hover */
+            box-shadow: 0 0 15px #FFFF00, 0 0 8px #FFFF00 inset;
+        }
 
         .forum-page-content { padding: 15px 20px; display: none; }
         .forum-page-content.active { display: block; animation: fadeInPage 0.5s ease-out; }
@@ -178,21 +190,6 @@
         }
         #ritualMessage { margin-top: 15px; font-weight: bold; font-family: var(--font-pixel); font-size: 18px; }
 
-        /* Activation Console */
-        #activationConsole { display: none; margin-top: 25px; padding: 15px; background-color: #222; border: 2px outset #000; color: #0F0; }
-        #activationConsole h4 { font-family: var(--font-pixel); font-size: 20px; margin-bottom: 10px; text-align: center; color: #0F0; }
-        #activationConsole input[type="text"] {
-            font-family: var(--font-pixel); background-color: #111; color: #0F0; border: 1px solid #0A0;
-            padding: 8px; width: calc(100% - 20px); max-width: 300px; margin: 0 auto 10px auto; display: block;
-            text-align: center; font-size: 18px;
-        }
-        #activationConsole button {
-            font-family: var(--font-pixel); background-color: #050; color: #0F0; border: 1px outset #0A0;
-            padding: 8px 15px; font-size: 16px; display: block; margin: 0 auto;
-        }
-        #activationConsole button:active { border-style: inset; }
-
-
         /* Video Player placeholder */
         .video-feed-container { text-align: center; }
         .video-placeholder-2000s {
@@ -234,7 +231,7 @@
             <ul>
                 <li><button id="nav-home" class="active-nav">Main Board</button></li>
                 <li><button id="nav-ritual">Bobby's Log: The Ritual Chamber</button></li>
-                <li><button id="nav-feed" class="locked">Surveillance Feed [LOCKED]</button></li>
+                <li><button id="nav-feed" class="highlighted-nav-button">Surveillance Feed</button></li>
             </ul>
         </nav>
 
@@ -308,15 +305,6 @@
                     <p id="ritualMessage"></p>
                 </div>
 
-                <!-- Activation Console (Initially Hidden) -->
-                <div id="activationConsole">
-                    <h4>:: SECURE CONNECTION TERMINAL ::</h4>
-                    <p style="font-size:14px; text-align:center; margin-bottom:10px;">Altar Alignment Confirmed. Enter Final Activation Sequence:</p>
-                    <input type="text" id="activationCodeInput" placeholder="[ SEQUENCE KEY ]">
-                    <button id="initiateConnectionButton">INITIATE CONNECTION</button>
-                    <p id="connectionMessage" style="text-align:center; margin-top:10px;"></p>
-                </div>
-
             </div>
 
             <div id="page-feed" class="forum-page-content">
@@ -324,20 +312,20 @@
                 <div class="video-feed-container">
                     <p style="font-family: var(--font-pixel); font-size:18px; color: #008000; margin-bottom:10px;">CONNECTION ESTABLISHED :: PLAYING ARCHIVED FOOTAGE...</p>
                     <div class="video-placeholder-2000s">
-                        <video id="surveillanceVideo" width="560" height="315" controls poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+                        <video id="surveillanceVideo" controls autoplay muted loop>
                             <source src="placeholder.mp4" type="video/mp4">
-                            Your browser does not support the video tag, or the file "placeholder.mp4" is missing.
+                            Your browser does not support the video tag. Maybe it's for the best...
                         </video>
                         <p>Archive File: CCTV_Basement_Incident_#####.mp4</p>
                     </div>
-                    <div class="forum-post" style="margin-top:20px; border-color:var(--forum-accent-glitch);">
-                        <div class="post-header"><span class="username">BobbyR_TruthSeeker</span> <span class="timestamp">FINAL LOG - URGENT</span></div>
-                        <div class="post-content">
-                            <h3 style="color:var(--forum-accent-glitch);">IT'S ON THE TAPE!</h3>
-                            <p>The ritual... it worked. Too well. The camera caught it all. Gretchen... the *thing*... and Blake... he ran OUT! AFTER it happened! The timestamp proves it! He's innocent!</p>
-                            <p>I have to get this out there... before they... or IT... finds me.</p>
-                            <p style="font-weight:bold; color:var(--forum-accent-glitch);">Oh god, what have I done?</p>
-                        </div>
+                     <div class="forum-post" style="margin-top:20px; border-color:var(--forum-accent-glitch);">
+                         <div class="post-header"><span class="username">BobbyR_TruthSeeker</span> <span class="timestamp">FINAL LOG - URGENT</span></div>
+                         <div class="post-content">
+                             <h3 style="color:var(--forum-accent-glitch);">IT'S ON THE TAPE!</h3>
+                             <p>The ritual... it worked. Too well. The camera caught it all. Gretchen... the *thing*... and Blake... he ran OUT! AFTER it happened! The timestamp proves it! He's innocent!</p>
+                             <p>I have to get this out there... before they... or IT... finds me.</p>
+                             <p style="font-weight:bold; color:var(--forum-accent-glitch);">Oh god, what have I done?</p>
+                         </div>
                     </div>
                 </div>
             </div>
@@ -386,7 +374,6 @@
                 ritual: document.getElementById('page-ritual'),
                 feed: document.getElementById('page-feed')
             };
-            let feedUnlocked = false;
 
             function setActiveNav(activeBtnId) {
                 for (const id in navButtons) {
@@ -397,41 +384,33 @@
 
             function showPage(pageId) {
                 for (const id in pages) { pages[id].classList.remove('active'); }
-                if (pages[pageId]) { pages[pageId].classList.add('active'); setActiveNav(pageId); }
+                if (pages[pageId]) { 
+                    pages[pageId].classList.add('active'); 
+                    setActiveNav(pageId); 
+                    window.scrollTo(0, 0); // Scroll to top when page changes
+                }
             }
 
             navButtons.home.addEventListener('click', () => showPage('home'));
             navButtons.ritual.addEventListener('click', () => showPage('ritual'));
+            
             navButtons.feed.addEventListener('click', () => {
-                if (feedUnlocked) {
-                    showPage('feed');
-                    const video = document.getElementById('surveillanceVideo');
-                    if (video) {
-                         // Attempt to play. Modern browsers might block autoplay without user interaction.
-                        video.play().catch(error => {
-                            console.warn("Video autoplay was prevented or an error occurred:", error);
-                            // Optionally, you could display a message to the user to click the play button.
-                        });
-                    }
-                } else {
-                    alert("Secure Channel Offline :: Complete The Ritual of Unveiling to establish connection.");
+                showPage('feed'); // Directly show the feed page
+                const video = document.getElementById('surveillanceVideo');
+                if (video) {
+                    video.play().catch(error => {
+                        console.warn("Video autoplay was prevented or an error occurred:", error);
+                    });
                 }
             });
 
-            // Ritual Altar Logic
+            // Ritual Altar Logic (Remains for the ritual page, but doesn't gate the feed)
             const glyphPaletteButtons = document.querySelectorAll('.glyph-palette button');
             const altarSlots = document.querySelectorAll('#altarGrid .altar-slot');
             const resetAltarButton = document.getElementById('resetAltarButton');
             const ritualMessage = document.getElementById('ritualMessage');
-            const activationConsole = document.getElementById('activationConsole');
-            const activationCodeInput = document.getElementById('activationCodeInput');
-            const initiateConnectionButton = document.getElementById('initiateConnectionButton');
-            const connectionMessage = document.getElementById('connectionMessage');
 
             const CORRECT_GLYPH_SEQUENCE = ["serpent", "eye", "star"];
-            const ACTIVATION_PHRASE = "V0ID_GAZE";
-            const SIGIL_COUNT = 3;
-            const FINAL_ACTIVATION_CODE = `${ACTIVATION_PHRASE}${SIGIL_COUNT}`; // V0ID_GAZE3
 
             let currentAltarSequence = [];
             let currentSlotIndex = 0;
@@ -467,11 +446,8 @@
                 });
                 ritualMessage.textContent = "Altar reset.";
                 ritualMessage.style.color = "#555";
-                activationConsole.style.display = 'none';
-                activationCodeInput.value = ''; // Clear activation input on reset
-                connectionMessage.textContent = '';
             }
-            resetAltarButton.addEventListener('click', resetAltar);
+            if(resetAltarButton) resetAltarButton.addEventListener('click', resetAltar);
 
             function checkAltarSequence() {
                 let allCorrect = true;
@@ -483,43 +459,23 @@
                         altarSlots[i].classList.add('correct');
                     }
                 }
-                 // Also mark remaining slots if sequence is shorter than slots but still wrong
-                for (let i = CORRECT_GLYPH_SEQUENCE.length; i < currentAltarSequence.length; i++) {
+                 for (let i = CORRECT_GLYPH_SEQUENCE.length; i < currentAltarSequence.length; i++) {
                     altarSlots[i].classList.add('incorrect');
                     allCorrect = false;
                 }
 
-
                 if (allCorrect && currentAltarSequence.length === CORRECT_GLYPH_SEQUENCE.length) {
-                    ritualMessage.textContent = "SEQUENCE ACCEPTED :: ALIGNMENT STABLE :: AWAITING ACTIVATION...";
+                    ritualMessage.textContent = "SEQUENCE ACCEPTED :: ALIGNMENT STABLE."; // Simplified message
                     ritualMessage.style.color = "#008000";
-                    activationConsole.style.display = 'block';
                 } else {
                     ritualMessage.textContent = "SEQUENCE INCORRECT :: ENERGY FLUCTUATIONS DETECTED! RESET ALTAR.";
                     ritualMessage.style.color = "var(--forum-accent-glitch)";
                 }
             }
 
-            initiateConnectionButton.addEventListener('click', () => {
-                if (activationCodeInput.value.trim().toUpperCase() === FINAL_ACTIVATION_CODE.toUpperCase()) {
-                    connectionMessage.textContent = "ACTIVATION SUCCESSFUL! Establishing secure connection to Surveillance Feed...";
-                    connectionMessage.style.color = "#00FF00";
-                    feedUnlocked = true;
-                    navButtons.feed.classList.remove('locked');
-                    navButtons.feed.click(); // Automatically navigate and try to play video
-                } else {
-                    connectionMessage.textContent = "ACTIVATION FAILED! CONNECTION REFUSED! Possible feedback loop detected!";
-                    connectionMessage.style.color = "#FF0000";
-                    activationCodeInput.style.animation = 'gateShake 0.3s';
-                    setTimeout(() => { activationCodeInput.style.animation = ''; }, 300);
-                }
-            });
-
-
             // Initial page
             showPage('home');
 
-            // CSS for gateShake (can be reused)
             const styleSheet = document.createElement("style");
             styleSheet.type = "text/css";
             styleSheet.innerText = `
